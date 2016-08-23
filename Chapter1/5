@@ -1,0 +1,49 @@
+＃4：矩阵交换行
+
+来源: POJ (Coursera声明：在POJ上完成的习题将不会计入Coursera的最后成绩。)
+
+注意： 总时间限制: 1000ms 内存限制: 65536kB
+
+描述
+
+在main函数中， 生成一个5*5的矩阵，输入矩阵数据，并输入n，m的值。判断n，m是否在数组范围内，如果不在，则输出error；如果在范围内，则将n行和m行交换，输出交换n，m后的新矩阵。
+
+输入
+
+5*5矩阵的数据，以及n和m的值。
+
+输出
+
+如果不可交换，则输出error
+
+如果可交换，则输出新矩阵
+
+#include "iostream"
+using namespace std;
+
+int main(){
+	int a[5][5], n, m, b[10] = {0};
+	for (int i = 0; i < 5; i++)
+		for (int j = 0; j < 5; j++){
+			cin >> a[i][j];
+		}
+	cout << "Please input two digital numbers m and n:";
+	cin >> m >> n;
+	if (m >= 5 || n >= 5){
+		cout << "error" << endl;
+		return 0;
+	}
+	for (int i = 0; i < 5; i++){
+		b[i] = a[m][i];
+		a[m][i] = a[n][i];
+		a[n][i] = b[i];
+	}
+	for (int i = 0; i < 5; i++){
+		for (int j = 0; j < 5; j++){
+			cout << a[i][j];
+			cout << "   ";
+		}
+		cout << endl;
+	}
+	return 0;
+}
