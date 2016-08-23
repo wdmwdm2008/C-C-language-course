@@ -1,0 +1,44 @@
+＃1：判断闰年
+
+来源: POJ (Coursera声明：在POJ上完成的习题将不会计入Coursera的最后成绩。)
+
+注意： 总时间限制: 1000ms 内存限制: 65536kB
+
+描述
+
+判断某年是否是闰年。
+
+输入
+
+输入只有一行，包含一个整数a(0 < a < 3000)
+
+输出
+
+一行，如果公元a年是闰年输出Y，否则输出N
+
+
+
+
+#include "iostream"
+using namespace std;
+
+int main(){
+	int N;
+	cin >> N;
+	if (N % 4 == 0){
+
+		if (N % 100 == 0 && N % 400 != 0){
+			cout << "N";
+		}
+		else if (N % 3200 == 0){
+			cout << "N";
+		}
+		else {
+			cout << "Y";
+		}
+	}
+	else {
+		cout << "N";
+	}
+	return 0;
+}
