@@ -1,0 +1,44 @@
+最长单词2
+
+来源: POJ (Coursera声明：在POJ上完成的习题将不会计入Coursera的最后成绩。)
+
+注意： 总时间限制: 1000ms 内存限制: 65536kB
+
+描述
+
+一个以'.'结尾的简单英文句子，单词之间用空格分隔，没有缩写形式和其它特殊形式
+
+输入
+
+一个以'.'结尾的简单英文句子（长度不超过500），单词之间用空格分隔，没有缩写形式和其它特殊形式
+
+输出
+
+该句子中最长的单词。如果多于一个，则输出第一个
+
+#include "iostream"
+#include "string"
+using namespace std;
+
+int main(){
+	int Long = 0, i = 0, j = 0, index;
+	char s[100];
+	cin.getline(s, 100);
+	while (s[i] != '\0'){
+		if (s[i] == ' ' || s[i] == '.'){
+			if (Long < j){
+				Long = j;
+				index = i - 1;
+			}
+			j = 0;
+			i++;
+		}
+		else{
+			i++;
+			j++;
+		}
+	}
+	for (int i = index - Long + 1; i <= index; i++)
+		cout << s[i];
+	return 0;
+}
