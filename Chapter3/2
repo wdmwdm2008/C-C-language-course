@@ -1,0 +1,42 @@
+四大湖问题（枚举法），大湖问题枚举法
+
+甲：洞庭湖最大，洪泽湖最小，鄱阳湖第三。
+乙：洪泽湖最大，洞庭湖最小，鄱阳湖第二，太湖第三。
+丙：洪泽湖最小，洞庭湖第三。
+丁：鄱阳湖最大，太湖最小，洪泽湖第二，洞庭湖第三。
+已知对于每个湖的大小，已知每人仅说对了一个，如果让计算机通过这些信息去判断四个湖的大学排名，也需具备逻辑推理能力。
+代码如下：
+
+#include <iostream>
+using namespace std;
+int main()
+{
+    int DT,HZ,PY,TH;
+    bool flag=false;
+    for (DT=1; DT<=4&&!flag; ++DT)
+    {
+        for (HZ=1; HZ<=4&&!flag; ++HZ)
+        {
+            if (DT==HZ)
+                continue;
+            else
+                for (PY=1; PY<=4&&!flag; ++PY)
+                {
+                    if (PY==DT||PY==HZ)
+                        continue;
+                    else
+                    {
+                        TH=10-DT-PY-HZ;
+                        if (((DT==1)+(HZ==4)+(PY==3))==1&&((HZ==1)+(DT==4)+(PY==2)+(TH==3))==1
+                                &&((HZ==4)+(DT==3))==1 &&((PY==1)+(TH==4)+(HZ==2)+(DT==3))==1)
+                        {
+                            cout<<"洞庭湖第"<<DT<<"名\n洪泽湖第"<<HZ<<"名\n鄱阳湖第"<<PY<<"名\n太湖第"<<TH<<"名\n";
+                            flag=true;
+
+                        }
+                    }
+                }
+        }
+    }
+    return 0;
+}
