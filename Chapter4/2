@@ -1,0 +1,23 @@
+放苹果方法
+
+
+#include <iostream>
+using namespace std;
+int count(int, int);
+
+int main(){
+	int apples, plates;
+	cin >> apples >> plates;
+	cout << count(apples, plates);
+	return 0;
+}
+
+
+int count(int m, int n){
+	if (m <= 1 || n <= 1)
+		return 1;
+		if (n > m)
+			return count(m, m);
+		else
+			return count(m, n - 1) + count(m - n, n);
+}
