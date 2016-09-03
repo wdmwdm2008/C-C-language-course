@@ -1,0 +1,73 @@
+编程题＃4：寻找平面上的极大点
+
+xn--: POJ-v92kl82b (Coursera声明：在POJ上完成的习题将不会计入Coursera的最后成绩。)
+
+注意： 总时间限制: 1000ms 内存限制: 65536kB
+
+描述
+
+在一个平面上，如果有两个点(x,y),(a,b),如果说(x,y)支配了(a,b)，这是指x>=a,y>=b;
+
+用图形来看就是(a,b)坐落在以(x,y)为右上角的一个无限的区域内。
+
+给定n个点的集合，一定存在若干个点，它们不会被集合中的任何一点所支配，这些点叫做极大值点。
+
+编程找出所有的极大点，按照x坐标由小到大，输出极大点的坐标。
+
+本题规定：n不超过100，并且不考虑点的坐标为负数的情况。
+
+输入
+
+输入包括两行，第一行是正整数n，表示是点数，第二行包含n个点的坐标，坐标值都是整数，坐标范围从0到100，输入数据中不存在坐标相同的点。
+
+输出
+
+按x轴坐标最小到大的顺序输出所有极大点。
+
+输出格式为:(x1,y1),(x2,y2),...(xk,yk)
+
+
+
+
+#include <iostream>
+using namespace std;
+
+struct point{
+	int x;
+	int y;
+};
+int main(){
+	int n, index = 0, tempx, tempy;
+	point a[100], b[100] = {'\0'};
+	cin >> n;
+	for (int i = 0; i < n; i++)
+		cin >> a[i].x >> a[i].y;
+	for (int i = 0; i < n; i++){
+		bool badpoint = false;
+		for (int j = 0; j < n; j++)
+			if (a[i].x <= a[j].x && a[i].y <= a[j].y && i != j){
+				badpoint = true;
+				break;
+			}
+		if (!badpoint){
+			b[index].x = a[i].x;
+			b[index].y = a[i].y;
+			index++;
+ 		}
+	}
+	for (int i = 0; i < index; i++)
+		for (int j = i + 1; j < index; j++){
+			if (b[i].x > b[j].x){
+				tempx = b[i].x;
+				b[i].x = b[j].x;
+				b[j].x = tempx;
+				tempy = b[i].y;
+				b[i].y = b[j].y;
+				b[j].y = tempy;
+			}
+		}
+	for (int i = 0; i < index - 1; ++i)
+		cout << "(" << b[i].x << "," << b[i].y << "),";
+	cout << "(" << b[index - 1].x << "," << b[index - 1].y << ")";
+	return 0;
+}
