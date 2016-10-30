@@ -1,0 +1,97 @@
+给定一个字符串和一个偏移量，根据偏移量旋转字符串(从左向右旋转)
+
+样例 
+对于字符串 “abcdefg”.
+
+offset=0 => “abcdefg” 
+offset=1 => “gabcdef” 
+offset=2 => “fgabcde” 
+offset=3 => “efgabcd”
+
+挑战 
+在数组上原地旋转，使用O(1)的额外空间
+
+public class Solution {
+    /*
+     * param A: A string
+     * param offset: Rotate string with offset.
+     * return: Rotated string.
+     */
+    public char[] rotateString(char[] A, int offset) {
+        if(null == A || A.length == 0) return A;
+        offset = offset % A.length;
+        for(int i  = 0; i < A.length/2; i++) {//整个字符串翻转
+            char c = A[i];
+            A[i] = A[A.length - 1 - i];
+            A[A.length - 1 - i] = c;
+        }
+        for(int i = 0; i < offset/2; i++) {//offset部分翻转
+            char c = A[i];
+            A[i] = A[offset - 1 - i];
+            A[offset - 1 - i] = c;
+        }
+        for(int i = 0; i < (A.length - offset + 1)/2; i++) {//剩余部分翻转
+            char c = A[offset + i];
+            A[offset + i] = A[A.length - 1 - i];
+            A[A.length - 1 - i] = c;
+        }
+        return A;
+    }
+};
+
+
+
+
+
+左旋转字符串
+题目：字符串的左旋转操作：把字符串前面的若干字符移到字符串的后面。例如：字符串abcdefg左旋转2位得到cdefgab。请实现左旋转字符串函数，要求对于长度为n的字符串，时间复杂度为O(n)，辅助内存为O(1)。
+
+算法思想：
+可以利用三次字符串反转操作，来达到左旋转字符串的目的：
+1.反转字符串的前半段；
+2.反转字符串的后半段；
+3.反转整个字符串。
+
+代码如下：
+[cpp] view plain copy 在CODE上查看代码片派生到我的代码片
+#include<iostream>  
+#include<string.h>  
+  
+using namespace std;  
+  
+// 本函数对string的子串进行反转操作  
+// start和end分别指明了字串的起始位置和结束位置（左闭右开区间）  
+void revert_string(char* string, int start, int end)  
+{  
+    int i=start, j=end-1;  
+    char tmp;  
+    while(i<j)  
+    {  
+        tmp = *(string+i);  
+        *(string+i) = *(string+j);  
+        *(string+j) = tmp;  
+        i++;  
+        j--;  
+    }  
+  
+}  
+  
+// 进行三次反转操作就可以完成左字符串旋转操作  
+void leftRotateString(char* string,  int i)  
+{  
+    int len = strlen(string);  
+    revert_string(string,0,i);  
+    revert_string(string,i,len);  
+    revert_string(string,0,len);  
+}  
+  
+int main(){  
+    // declaring string as a char pointer instead of a char array  
+    // will cause the program to crash, i.e., using the following declaration  
+    //        char* string = "This_is_a_sample_string";  
+    // will make the program crash  
+    char string[] = "This_is_a_sample_string";  
+    leftRotateString(string, 4);  
+    cout<<string<<endl;  
+    return 0;  
+}  
