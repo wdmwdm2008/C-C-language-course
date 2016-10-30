@@ -1,0 +1,146 @@
+LeetCode-rotateRight
+Given a list, rotate the list to the right by k places, where k is non-negative.
+
+For example:
+Given 1->2->3->4->5->NULL and k = 2,
+return 4->5->1->2->3->NULL.
+
+题解：
+
+这道题主要先理解题意，就是倒着数k个node，从那开始到结尾和之前那部分对调，那个例子就是，4->5拿前面来，1->2->3拿后面去。
+
+几个特殊：
+
+k是可以大于整个list的长度的，所以这时要对k对len取模
+
+如果取模之后得0，相当于不用rotate，直接返回
+
+思路（3种方法）:
+
+1、首先分析，涉及到一块链表，就要使用faster/slower双指针，，还涉及到链表的换位，那么要注意块链表的前驱节点的指向---->那么引出要构建一个新的head节点（下面还有种方法），new 一个ListNode；
+
+    需要注意的是：双指针节点的位置。
+
+public class RotateList {
+    private class ListNode {
+        int val;
+        ListNode next;
+        ListNode(int x) {
+            val = x;
+        }
+    }
+
+     public ListNode rotateRight(ListNode head, int k) {
+            if (head == null || head.next == null) {
+                return head;
+            }
+            int len = 0;
+            ListNode countlen = head;
+            while (countlen != null) {
+                len++;
+                countlen = countlen.next;
+            }
+                        
+            ListNode a = new ListNode(-1);
+            a.next = head;
+            head = a;
+            
+            ListNode r, p, q;
+            r = head;
+            p = r.next;
+            q = r.next;
+                        
+            k = k % len;
+        if(k == 0)      return head.next;
+        
+       for(int i= 1;i<k;i++){
+               q= q.next;
+           }
+           
+           while (q.next != null) {
+                    q = q.next;
+                    p = p.next;
+                    r = r.next;
+
+            }
+            r.next = null;
+            q.next = head.next;
+            head.next = p;
+            return head.next;
+        }
+
+ 
+
+2、处理完特殊情况后，就用熟悉的faster/slower双指针解决就好（看到这种linkedlist，倒着数数的，就条件反射了）
+
+先对faster设步长为n，然后faster和slower再一起走，知道faster.next==null，说明slower指向要倒着数的开始点的前一个位置。
+
+所以slow.next就是要返回的newhead，保存一下。
+
+然后把faster.next接到head上，slower.next存为null，作队尾。
+
+这样就把list给rotate了。
+
+（这里要注意，一个链表是用head来表示其在内存中的位置，因此，只要返回一个head，就可以找到该链表！因此，我们可以令链表的任意node为newhead，使尾节点的next为head（原来的），然后返回newhead，这就是链表常用思路）
+
+ public ListNode rotateRight(ListNode head, int k) {
+        if(head==null||head.next==null)
+            return head;
+        k=k%length(head);
+        if(k==0)
+            return head;
+        ListNode fast = head;
+        ListNode slow = head;
+        while(k-->0)
+            fast=fast.next;
+
+        while(fast.next!=null){
+            fast=fast.next;
+            slow=slow.next;
+        }
+        ListNode newHead=slow.next;         //这里重置一个head
+        slow.next=null;
+        ListNode cur=newHead;
+        while(cur.next!=null)
+            cur=cur.next;
+        cur.next=head;
+        return newHead;
+    }
+
+    public int length(ListNode head){
+        int res=0;
+        while(head!=null){
+            res++;
+            head=head.next;
+        }
+        return res;
+    }
+3、还有一种就是把整个list连起来，变成环，找到切分点断开就行。（循环链表来做。）
+
+public ListNode rotateRight(ListNode head, int k) {
+    
+    if(head == null || head.next == null) return head;
+
+    // Get length
+    int len = 1;
+    ListNode tail = head;
+    while(tail.next != null) {
+        tail = tail.next;
+        len++;
+    }
+
+    // Go to position k distance to tail
+    k = k % len;
+    if(k == 0) return head;
+    ListNode newTail = head;
+    for(int i = 0; i < len - k - 1; i++) {
+        newTail = newTail.next;
+    }
+
+    // Join two parts
+    ListNode newHead = newTail.next;   
+    newTail.next = null;
+    tail.next = head;
+
+    return newHead;
+}
