@@ -1,0 +1,57 @@
+情况4，非二叉树，只是普通的多叉树，且树中每个节点不包含指向父节点的指针
+
+此时，先求得从根节点到p和q的路径，转换为求链表的最后一个公共子节点。
+/*（4）情况4，非二叉树，只是普通的多叉树，且树中每个节点不包含指向父节点的指针
+此时，先求得从根节点到p和q的路径，转换为求链表的最后一个公共子节点。
+*/
+
+/*含有父节点指针的普通二叉树节点结构*/
+
+
+typedef TreeNode{
+  int val;
+  TreeNode *left;
+  TreeNode *m_vChild;
+  TreeNode(int val) : val(val), m_vChild(vector<TreeNode*> ()) {}
+}
+
+
+bool getNodePath(TreeNode* root, TreeNode* p, vector<TreeNode*> &pV){
+  if (root == node)
+     return true;
+  pV.push_back(root);
+  bool found = false;
+  vector<TreeNode*> :: iterator iter = root->m_vChild.begin();
+  while(!found && iter != root->m_vChild.end()){
+    found = getNodePath(*iter, p, pV);
+    ++iter;
+  }
+  if (!found)
+    pV.pop_back();
+  return found;
+}
+
+
+TreeNode *getLastCommonNode(vector<TreeNode *> pV, vector<TreeNode *> qV){
+   if (pV.empty() && qV.empty())
+      return NULL;
+   vector<TreeNode*>::iterator pIter = pV.begin(), qIter = qV.begin();
+   TreeNode* res;
+   while (pIter != pV.end() || qIter != qV.end()){
+      if (*pIter == qIter)
+          res = pIter;
+      ++pIter;
+      ++qIter;      
+   }
+   return res;
+   return res;
+}
+
+TreeNode *getLastCommonParent4(TreeNode *root, TreeNode *p, TreeNode *q){
+  if (root == NULL) return NULL;
+  vector<TreeNode*> pV, qV;
+  getNodePath(root, p, pV);
+  getNodePath(root, q, qV);
+  
+  return getLastCommonNode(pv, qv);
+}
