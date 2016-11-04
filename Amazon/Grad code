@@ -1,0 +1,28 @@
+题目
+Given two hexadecimal numbers find if they can be consecutive in gray code
+For example: 10001000, 10001001
+return 1
+since they are successive in gray code
+
+Example2: 10001000, 10011001
+return -1
+since they are not successive in gray code
+
+ public static int grayCheck(byte term1, byte term2) {
+           // XOR operation by bit
+           // for gray code there is only one diff between two terms
+        byte rst = (byte)(term1 ^ term2);
+        for (int i = 0; i <= 7; i++) {
+            byte tmp = (byte)(1 << i);
+            if (tmp == rst) {
+            return 1;
+            }
+        }
+        return 0;
+    }
+    public static void main(String[] args) {
+        byte term1 = (byte)0x0a, term2 = (byte)0x80;
+        int out;
+        out = grayCheck(term1, term2);
+        System.out.println(out);
+    }
