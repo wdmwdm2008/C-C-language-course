@@ -1,0 +1,35 @@
+题目
+Given two words, find if second word is the round rotation of first word.
+For example: abc, cab
+return 1
+since cab is round rotation of abc
+
+Example2: ab, aa
+return -1
+since ab is not round rotation for aa
+
+
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+
+bool RotateString(string word1, string word2){
+	if (word1.length() != word2.length() || word1.length() == 0)
+		return -1;
+	string str = word1 + word2;
+	if (str.find(word2) != string::npos)
+		return true;
+	else
+		return false;
+}
+
+
+
+
+int main(){
+	string word1 = "abc", word2 = "cab";
+	bool jud = RotateString(word1, word2);
+	return 0;
+}
