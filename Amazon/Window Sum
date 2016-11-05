@@ -1,0 +1,16 @@
+ 注意(arraylist == null || arraylist.size() == 0)要return一个已经初始化的arrayList而不是null，否则会有一个test case过不去。
+ 
+ 
+ 
+ public List<Integer> GetSum(List<Integer> A, int k) {
+
+        ArrayList<Integer> res = new ArrayList<>();
+        int len = A.size();
+        for (int i = 0; i + k - 1 < len; ++i) {
+            int sum = 0;
+            for (int j = 0; j < k; ++j) {
+                sum += A.get(i+j);
+            }
+            res.add(i,sum);
+        }
+        return res;
