@@ -1,0 +1,55 @@
+GCD Greatest Common Divisor 最大公约数
+字数1106 阅读368 评论2 喜欢0
+题目
+找一个数组中所有数的最大公约数。
+
+欧几里得算法
+又称为辗转相除法，用于计算两个整数a和b的最大公约数。
+定理：gcd(a,b) = gcd(b,a mod b)
+
+证明：a可以表示成a = kb + r，则r = a mod b
+假设d是a,b的一个公约数，则有
+d|a, d|b，而r = a - kb，因此d|r
+因此d是(b,a mod b)的公约数
+
+假设d 是(b,a mod b)的公约数，则
+d | b , d |r ，但是a = kb +r
+因此d也是(a,b)的公约数
+
+因此(a,b)和(b,a mod b)的公约数是一样的，其最大公约数也必然相等，得证。
+
+
+
+import java.lang.Math;
+public class GCD {
+    public int result(int[] array) {
+        int len = array.length;
+        int res = array[0];
+        for (int i=1; i < len; ++i) {
+            res = gcd(res, array[i]) ;
+        }
+        return res;
+    }
+
+    private int gcd(int num1, int num2 ) {
+        if (num1 == num2) {
+            return num1;
+        }
+        int div = Math.min(num1, num2);
+        int ori1 = num1;
+        int ori2 = num2;
+        if (div == 0) {
+            return Math.max(num1,num2);
+        }
+        while (ori1 % div != 0 || ori2 % div != 0){
+            if (Math.max(num1, num2) % Math.min(num1, num2) == 0) {
+                return Math.min(num1, num2);
+            } else {
+                div = Math.max(num1, num2) % Math.min(num1, num2);
+            }
+            num1 = Math.min(num1,num2);
+            num2 = div;
+        }
+        return div;
+    }
+}
