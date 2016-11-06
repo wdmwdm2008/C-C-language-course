@@ -1,0 +1,130 @@
+Minimum Spanning Tree
+字数216 阅读1284 评论0 喜欢1
+给出一个ArrayList<Connection>，里面是Connection类(edge两端的城市名和它们之间的一个cost)，要求找出一些边，把所有城市连接起来并且总花费最小。不能有环，最后所以城市要连成一个连通块。不能的话输出空表或者null(这个不太记得，题目有说，有占一个case)，最后还要按城市名字(先node1，node1相同按node2)排序输出。这题我用了union find + kruskal的做法，可以上网查一下，网上类似的资料很多，我也是网上参考的。
+class Connection
+String node1;
+String node2;
+int cost;
+}
+输入:
+("Acity","Bcity",1}
+("Acity","Ccity",2}
+("Bcity","Ccity",3}
+输出：
+("Acity","Bcity",1}
+("Acity","Ccity",2}
+
+
+
+
+struct Connection{
+	string node1;
+	string node2;
+	int cost;
+	Connection(string a, string b, int c){
+		node1 = a;
+		node2 = b;
+		cost = c;
+	}
+};
+
+struct cmp{
+	bool operator()(const Connection &l1, const Connection &l2){
+		return l1.cost > l2.cost;
+	}
+};
+
+	int unionNum;//这里开个全局变量，不丢人。
+
+	vector<Connection> getLowCost(vector<Connection> connections){
+		//先把空的情形挡掉
+		if (connections.size() == 0)
+			return{};
+
+		vector<Connection> result;
+		unordered_map<string, int, cmp> map;
+		unionNum = 0;
+
+
+		for (Connection c : connections){
+			string a = c.node1;
+			string b = c.node2;
+			//看城市是不是连过了，要是可以连，那么就在result里面加上
+			if (union1(map, a, b)){
+				result.push_back(c);
+			}
+		}
+		//这里要检查一下,是不是所有的城市都属于同一个union
+		String find = connections.get(0).node1;
+		int union = map.get(find);
+		for (String str : map.keySet()){
+			// 如果我们中出了一个叛徒，返回空表
+			if (map.get(str) != union){
+				return new ArrayList<>();
+			}
+		}
+		//这里最后要求按照城市的名字排序
+		Collections.sort(result, new Comparator<Connection>() {
+			@Override
+				public int compare(Connection o1, Connection o2) {
+				if (o1.node1.equals(o2.node1)){
+					return o1.node2.compareTo(o2.node2);
+				}
+				return o1.node1.compareTo(o2.node1);
+			}
+		});
+		return result;
+	}
+
+
+	bool union1(unordered_map<string, int, cmp> map, string a, string b){
+		if (map.find(a) == map.end() && map.find(b) == map.end()){
+			map[a] = unionNum;
+			map[b] = unionNum;
+			//这里用了一个新的没用过的数字
+			unionNum++;
+			return true;
+		}
+		//只有一方落单,那就加入有组织的一方
+		if (map.find(a) != map.end() && map.find(b) == map.end()){
+			int aU = map[a];
+			map[b] = aU;
+			return true;
+		}
+		if (map.find(a) == map.end() && map.find(b) != map.end()){
+			int aU = map[b];
+			map[a] = aU;
+			return true;
+		}
+		//两个人都有团伙的情况。
+		int aU = map[a];
+		int bU = map[b];
+		//如果是自己人,那肯定要踢掉,否则成环了
+		if (aU == bU) return false;
+		//把所有对方的团伙都吃进来
+		for (string s : map.first()) {
+			if (map[s] == bU) map[s] = aU;
+		}
+		return true;
+	}
+
+
+
+int main() {
+		vector<Connection> connections;
+		//下面的图是个苯环，中间加上了几根，如果想验证空表，去掉几根线就行。
+		connections.push_back(Connection("A", "B", 6));
+		connections.push_back(Connection("B", "C", 4));
+		connections.push_back(Connection("C", "D", 5));
+		connections.push_back(Connection("D", "E", 8));
+		connections.push_back(Connection("E", "F", 2));
+		connections.push_back(Connection("B", "F", 10));
+		connections.push_back(Connection("E", "C", 9));
+		connections.push_back(Connection("F", "C", 7));
+		connections.push_back(Connection("B", "E", 3));
+		connections.push_back(Connection("A", "F", 16));
+
+		//这里就输出一下看看结果。
+		vector<Connection> res = getLowCost(connections);
+		return 0;
+	}
