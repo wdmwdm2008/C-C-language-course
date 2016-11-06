@@ -1,0 +1,36 @@
+class LRUCache{
+public:
+    size_t m_capacity;                                           // size_t means unsigned int range in [0, INT_MAX]
+    unordered_map<int, list<pair<int, int>> :: iterator> m_map;  // m_map_itera->first: key, m_map_itera->second: list iterator
+    list<pair<int, int>> m_list;                                 // m_list_itera->first: key, m_list_itera->second: value
+    
+    LRUCache(int capacity):m_capacity(capacity) {
+        
+    }
+    
+    int get(int key) {
+        auto found_iter = m_map.find(key);
+        if (found_iter == m_map.end())
+            return -1;
+        m_list.splice(m_list.begin(), m_list, found_iter->second);      // move the node corresponding to key to front
+        return found_iter->second->second;                              // return the value of the node
+    }
+    
+    void set(int key, int value) {
+        auto found_iter = m_map.find(key);
+        if (found_iter != m_map.end()){
+            m_list.splice(m_list.begin(), m_list, found_iter->second);
+            found_iter->second->second = value;
+            return;
+        }
+        
+        if (m_list.size() == m_capacity){
+            int delKey = m_list.back().first;
+            m_list.pop_back();                                              // remove node in list
+            m_map.erase(delKey);                                            // remove key in map
+        }
+        
+        m_list.emplace_front(key, value);
+        m_map[key] = m_list.begin();
+    }
+};
