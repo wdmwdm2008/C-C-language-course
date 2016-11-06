@@ -1,0 +1,40 @@
+每人最高五个分数平均分
+字数123 阅读1028 评论38 喜欢0
+输入是List<节点>，节点里面有两个属性学生id和分数，同时保证保证每个学生至少会有5个节点(即至少有5个分数)，返回一个map，key是id，value是每个人最高5个分数的平均分。这题很简单，对每个学生用一个prioriy queue就行了
+
+用priority queue做。对每个学生用一次。
+
+
+struct cmp{
+	bool operator()(const int &l1, const int &l2){
+		return l1 > l2;
+	}
+};
+
+int main(){
+	unordered_map<char, priority_queue<int, vector<int>, cmp>> aQ;
+	aQ['a'].push(2);
+	aQ['a'].push(3);
+	aQ['a'].push(4);
+	aQ['a'].push(5);
+	aQ['a'].push(6); 
+	aQ['a'].push(7);
+	aQ['a'].push(9);
+	aQ['a'].push(8);
+	aQ['c'].push(2);
+	aQ['c'].push(3);
+	aQ['c'].push(4);
+	aQ['c'].push(5);
+	aQ['c'].push(6);
+	aQ['c'].push(7);
+	aQ['c'].push(9);
+	aQ['c'].push(8);
+	int sum = 0;
+	for (auto temp : aQ){
+		for (int i = 0; i < temp.second.size(); i++){
+			sum += temp.second.top();
+			temp.second.pop();
+		}
+	}
+	return 0;
+}
