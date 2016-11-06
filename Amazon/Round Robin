@@ -1,0 +1,122 @@
+一个处理器要处理一堆request，一次只能处理一条，每次执行一个任务最多执行时间q，接着执行等待着的下一个任务。若前一个任务没执行完则放到队尾，等待下一次执行。
+
+假设只要有任务开始以后cpu是不会空闲的，也就是说cpu开始后如果空闲了就说明没有任务了，另外Robin Round最后返回值是float。
+
+OA 示例：
+例子： 【0，1，4】 【5，2，3】 q=3. 输出的是average wait time 2.3333333
+第0秒，任务1进队列。我们peek目前队列中有的任务是任务1，我们发现任务1开始时间第0秒，目前也是第0秒，所以任务1等待时间是0。然后任务1执行3秒，它自身还有2秒钟。
+这时候我们查看3秒的时候哪些任务达到了，发现任务2在第1秒到达。于是任务2进队列。
+这时候我们查看任务1有没有执行完，发现没有执行完，于是我们poll任务1，再把任务1 add到队列末尾。
+这时候队列的顺序是任务2，任务1.
+
+现在我们再次peek队列，于是找到任务2.我们发现任务2在第1秒到达了，目前我们在第3秒。所以等待时间是3-1=2.
+我们重复刚刚的步骤，发现任务2执行时间只要2秒，于是我们到第5秒。这时候我们查找第5秒哪些任务到达了。我们发现任务3也到达了。于是任务3进队列。
+所以目前队列顺序是任务2，任务1，任务3.
+我们又发现任务2已经执行完了，于是我们把任务2 poll出队列，不再把它放进队列里了。
+所以现在队列里面剩余的任务是任务1，任务3.
+
+于是我们再peek队列。请注意，这时候的q被重新设置过了，不是3－2=1秒，而是又是3秒。
+我们再次peek队列，找到任务1，目前是在第5秒，我们刚刚执行过任务1，他暂停在第3秒，所以任务1又等了2秒。目前秒数是2+2=4秒。
+目前任务1还有2秒。我们执行完任务1以后，到达第5+2 ＝ 7把他扔出队列。目前队列里只有任务3了。
+
+然后我们再peek，现在只有任务3了，目前我们在第7秒。任务3进来的时候在第4秒。所以任务3等了7-4 ＝ 3秒。所以等待时间又加3秒。
+所以最终等待时间是2+2+3 ＝ 7秒。平均等待时间是7/3 ＝ 2.3333秒。
+
+
+
+
+#include <queue>
+#include <iostream>
+using namespace std;
+
+struct process{
+	int arrTime;
+	int exeTime;
+	process(int arr, int exe) : arrTime(arr), exeTime(exe){};
+};
+
+float Solution(vector<int> Atime, vector<int> Etime, int q){
+	if (Atime.size() == 0 || Etime.size() == 0 || Atime.size() != Etime.size())
+		return 0; 
+	
+	int length = Atime.size();
+	queue<process> aQueue;
+	int curTime = 0, waitTime = 0;
+	int index = 0;
+	while (!aQueue.empty() || index < length){
+		if (!aQueue.empty()){
+			process cur = aQueue.front();
+			aQueue.pop();
+			waitTime += curTime - cur.arrTime;
+			curTime += min(q, cur.exeTime);
+			for (; index < length && Atime[index] <= curTime; index++)
+				aQueue.push(process(Atime[index], Etime[index]));
+			if (cur.exeTime > q)
+				aQueue.push(process(curTime, cur.exeTime - q));
+		}
+		else{
+			aQueue.push(process(Atime[index], Etime[index]));
+			curTime = Atime[index++];
+		}
+	}
+	return (float)waitTime / length;
+}
+
+
+int main(){
+	vector<int> Atime = { 0, 1, 3, 9 };
+	vector<int> Etime = { 2, 1, 7, 5 };
+	float fin = Solution(Atime, Etime, 3);
+	return 0;
+}
+
+
+
+
+
+float Solution(vector<int> Atime, vector<int> Etime, int q) {
+	if (Atime.size() == 0 || Etime.size() == 0 || Atime.size() != Etime.size())
+		return 0;
+	queue<process> aQueue;
+	int length = Etime.size();
+	int curTime = 0, waitTime = 0;
+	int index = 0;
+	while (true){
+		if (!aQueue.empty()){
+			process cur = aQueue.front();
+			aQueue.pop();
+			waitTime += curTime - cur.arrTime;
+			if (cur.excuteTime <= q){
+				curTime += cur.excuteTime;
+				Etime[index] = Etime[index] - cur.excuteTime;
+			}
+			else{
+				curTime += q;
+				Atime[index] = curTime;
+				Etime[index] = Etime[index] - q;
+			}
+
+			int min = 1000000;
+			int count = 0;
+
+
+			for (int i = 0; i < Atime.size(); i++){
+				if (Atime[i] <= curTime){
+					if (min > Etime[i] && Etime[i] > 0){
+						min = Etime[i];
+						index = i;
+					}
+					if (Etime[i] < 1)
+						count++;
+				}
+			}
+			if (count == Atime.size()){
+				break;
+			}
+		}
+		else{
+			aQueue.push(process(Atime[index], Etime[index]));
+		}
+	}
+	return (float)waitTime / Atime.size();
+}
