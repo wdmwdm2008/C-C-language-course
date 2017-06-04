@@ -1,0 +1,143 @@
+1 #include <netinet/in.h>
+  2 #include <sys/socket.h>
+  3 #include <stdio.h>
+  4 #include <string.h>
+  5 #include <stdlib.h>
+  6 #include <sys/epoll.h>
+  7 #include <time.h>
+  8 #include <unistd.h>
+  9 #include <sys/types.h>
+ 10 #include <arpa/inet.h>
+ 11 
+ 12 #define MAXSIZE     100000
+ 13 #define IPADDRESS   "127.0.0.1"
+ 14 #define SERV_PORT   8787
+ 15 #define FDSIZE        1024
+ 16 #define EPOLLEVENTS 20
+ 17 
+ 18 static void handle_connection(int sockfd);
+ 19 static void
+ 20 handle_events(int epollfd,struct epoll_event *events,int num,int sockfd,char *buf);
+ 21 static void do_read(int epollfd,int fd,int sockfd,char *buf);
+ 22 static void do_read(int epollfd,int fd,int sockfd,char *buf);
+ 23 static void do_write(int epollfd,int fd,int sockfd,char *buf);
+ 24 static void add_event(int epollfd,int fd,int state);
+ 25 static void delete_event(int epollfd,int fd,int state);
+ 26 static void modify_event(int epollfd,int fd,int state);
+ 27 
+ 28 int main(int argc,char *argv[])
+ 29 {
+ 30     int                 sockfd;
+ 31     struct sockaddr_in  servaddr;
+ 32     sockfd = socket(AF_INET,SOCK_STREAM,0);
+ 33     bzero(&servaddr,sizeof(servaddr));
+ 34     servaddr.sin_family = AF_INET;
+ 35     servaddr.sin_port = htons(SERV_PORT);
+ 36     inet_pton(AF_INET,IPADDRESS,&servaddr.sin_addr);
+ 37     connect(sockfd,(struct sockaddr*)&servaddr,sizeof(servaddr));
+ 38     //处理连接
+ 39     handle_connection(sockfd);
+ 40     close(sockfd);
+ 41     return 0;
+ 42 }
+ 43 
+ 44 
+ 45 static void handle_connection(int sockfd)
+ 46 {
+ 47     int epollfd;
+ 48     struct epoll_event events[EPOLLEVENTS];
+ 49     char buf[MAXSIZE];
+ 50     int ret;
+ 51     epollfd = epoll_create(FDSIZE);
+ 52     add_event(epollfd,STDIN_FILENO,EPOLLIN);
+ 53     for ( ; ; )
+ 54     {
+ 55         ret = epoll_wait(epollfd,events,EPOLLEVENTS,-1);
+ 56         handle_events(epollfd,events,ret,sockfd,buf);
+ 57     }
+ 58     close(epollfd);
+ 59 }
+ 60 
+ 61 static void
+ 62 handle_events(int epollfd,struct epoll_event *events,int num,int sockfd,char *buf)
+ 63 {
+ 64     int fd;
+ 65     int i;
+ 66     for (i = 0;i < num;i++)
+ 67     {
+ 68         fd = events[i].data.fd;
+ 69         if (events[i].events & EPOLLIN)
+ 70             do_read(epollfd,fd,sockfd,buf);
+ 71         else if (events[i].events & EPOLLOUT)
+ 72             do_write(epollfd,fd,sockfd,buf);
+ 73     }
+ 74 }
+ 75 
+ 76 static void do_read(int epollfd,int fd,int sockfd,char *buf)
+ 77 {
+ 78     int nread;
+ 79     nread = read(fd,buf,MAXSIZE);
+ 80         if (nread == -1)
+ 81     {
+ 82         perror("read error:");
+ 83         close(fd);
+ 84     }
+ 85     else if (nread == 0)
+ 86     {
+ 87         fprintf(stderr,"server close.\n");
+ 88         close(fd);
+ 89     }
+ 90     else
+ 91     {
+ 92         if (fd == STDIN_FILENO)
+ 93             add_event(epollfd,sockfd,EPOLLOUT);
+ 94         else
+ 95         {
+ 96             delete_event(epollfd,sockfd,EPOLLIN);
+ 97             add_event(epollfd,STDOUT_FILENO,EPOLLOUT);
+ 98         }
+ 99     }
+100 }
+101 
+102 static void do_write(int epollfd,int fd,int sockfd,char *buf)
+103 {
+104     int nwrite;
+105     nwrite = write(fd,buf,strlen(buf));
+106     if (nwrite == -1)
+107     {
+108         perror("write error:");
+109         close(fd);
+110     }
+111     else
+112     {
+113         if (fd == STDOUT_FILENO)
+114             delete_event(epollfd,fd,EPOLLOUT);
+115         else
+116             modify_event(epollfd,fd,EPOLLIN);
+117     }
+118     memset(buf,0,MAXSIZE);
+119 }
+120 
+121 static void add_event(int epollfd,int fd,int state)
+122 {
+123     struct epoll_event ev;
+124     ev.events = state;
+125     ev.data.fd = fd;
+126     epoll_ctl(epollfd,EPOLL_CTL_ADD,fd,&ev);
+127 }
+128 
+129 static void delete_event(int epollfd,int fd,int state)
+130 {
+131     struct epoll_event ev;
+132     ev.events = state;
+133     ev.data.fd = fd;
+134     epoll_ctl(epollfd,EPOLL_CTL_DEL,fd,&ev);
+135 }
+136 
+137 static void modify_event(int epollfd,int fd,int state)
+138 {
+139     struct epoll_event ev;
+140     ev.events = state;
+141     ev.data.fd = fd;
+142     epoll_ctl(epollfd,EPOLL_CTL_MOD,fd,&ev);
+143 }
