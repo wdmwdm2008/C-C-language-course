@@ -12,7 +12,7 @@
  12 
  13 #define IPADDRESS   "127.0.0.1"
  14 #define PORT        8787
- 15 #define MAXSIZE     1024
+ 15 #define MAXSIZE     100000
  16 #define LISTENQ     5
  17 #define FDSIZE      1000
  18 #define EPOLLEVENTS 100
